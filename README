@@ -3,7 +3,7 @@ NAME
     DBIx::Class::ResultSets in a web context
 
 VERSION
-    version 0.001000
+    version 0.001001
 
 SYNOPSIS
      package MyApp::People;
@@ -194,8 +194,9 @@ EXPORTED SUBS
      my $searched_rs = simple_search(c => $c, $c->model('DB::Foo'));
 
     Searches the resultset based on all fields in the request. Searches with
-    "$fieldname => { -like => "%$value%" }". If there are multiple values
-    for a CGI parameter it will use all values via an "or".
+    "$fieldname => { -like => "%$value%" }" for char fields, everything else
+    gets basic equality searchs. If there are multiple values for a CGI
+    parameter it will use all values via an "or".
 
     The sole configuration value is "skip" and it is used to skip
     unsearchable parameters. The default is "limit start sort dir _dc rm

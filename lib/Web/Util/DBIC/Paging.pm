@@ -1,6 +1,6 @@
 package Web::Util::DBIC::Paging;
 {
-  $Web::Util::DBIC::Paging::VERSION = '0.001000';
+  $Web::Util::DBIC::Paging::VERSION = '0.001001';
 }
 
 # ABSTRACT: Easily page, search, and sort DBIx::Class::ResultSets in a web context
@@ -97,10 +97,18 @@ sub simple_search {
    my $searches = {};
    my $params = _params_for($type, $foo);
    foreach ( keys %{ $params } ) {
-      if ( $params->{$_} and not $skips{$_} ) {
-         # should be configurable
-         $searches->{$rs->current_source_alias.q{.}.$_} =
-            { like => [map "%$_%", $params->{$_}] };
+      my $v = $params->{$_};
+      if ( $v and not $skips{$_} ) {
+
+         my $src = $rs->result_source;
+         if (
+            $src->has_column($_) &&
+            ($src->column_info($_)->{type}||'') =~ m/char/i
+         ) {
+            $searches->{$rs->current_source_alias.q{.}.$_} = { -like => "%$v%" }
+         } else {
+            $searches->{$rs->current_source_alias.q{.}.$_} = $v
+         }
       }
    }
 
@@ -165,7 +173,7 @@ Web::Util::DBIC::Paging - Easily page, search, and sort DBIx::Class::ResultSets 
 
 =head1 VERSION
 
-version 0.001000
+version 0.001001
 
 =head1 SYNOPSIS
 
@@ -376,8 +384,9 @@ C<< $rs->delete_all >>
  my $searched_rs = simple_search(c => $c, $c->model('DB::Foo'));
 
 Searches the resultset based on all fields in the request.  Searches with
-C<< $fieldname => { -like => "%$value%" } >>.  If there are multiple values for
-a CGI parameter it will use all values via an C<or>.
+C<< $fieldname => { -like => "%$value%" } >> for char fields, everything else
+gets basic equality searchs.  If there are multiple values for a CGI parameter
+it will use all values via an C<or>.
 
 The sole configuration value is C<skip> and it is used to skip unsearchable
 parameters.  The default is C<< limit start sort dir _dc rm xaction >>.
