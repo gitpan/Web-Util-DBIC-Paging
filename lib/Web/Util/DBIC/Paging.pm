@@ -1,6 +1,6 @@
 package Web::Util::DBIC::Paging;
 {
-  $Web::Util::DBIC::Paging::VERSION = '0.001002';
+  $Web::Util::DBIC::Paging::VERSION = '0.001003';
 }
 
 # ABSTRACT: Easily page, search, and sort DBIx::Class::ResultSets in a web context
@@ -103,7 +103,7 @@ sub simple_search {
          my $src = $rs->result_source;
          if (
             $src->has_column($_) &&
-            ($src->column_info($_)->{data_type}||'') =~ m/char/i
+            ($src->column_info($_)->{data_type}||'') =~ m/char|text/i
          ) {
             $searches->{$rs->current_source_alias.q{.}.$_} =
                 { -like => ref $v ? [ map "%$_%", @$v ] : "%$v%" }
@@ -174,7 +174,7 @@ Web::Util::DBIC::Paging - Easily page, search, and sort DBIx::Class::ResultSets 
 
 =head1 VERSION
 
-version 0.001002
+version 0.001003
 
 =head1 SYNOPSIS
 

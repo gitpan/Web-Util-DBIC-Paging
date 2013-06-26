@@ -3,7 +3,7 @@ NAME
     DBIx::Class::ResultSets in a web context
 
 VERSION
-    version 0.001002
+    version 0.001003
 
 SYNOPSIS
      package MyApp::People;
